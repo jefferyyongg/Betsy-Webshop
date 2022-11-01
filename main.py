@@ -65,9 +65,6 @@ def purchase_product(product_id, buyer_id, quantity):
     report(product_id, buyer_id, quantity)
 
 
-purchase_product(1, 1, 1)
-
-
 def remove_product(product_id):
     Product.delete().where(Product.id == product_id).execute()
     User_to_product.delete().where(User_to_product.product_id == product_id).execute()
