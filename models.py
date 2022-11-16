@@ -20,7 +20,6 @@ class Product(BaseModel):
     name = CharField()
     description = CharField()
     price_per_unit = DecimalField(decimal_places=2, auto_round=True)
-    quantity = IntegerField()
     tag = ManyToManyField(Tag, backref="product")
 
 
@@ -35,6 +34,7 @@ class User(BaseModel):
 class User_to_product(BaseModel):
     user_id = ForeignKeyField(User)
     product_id = ForeignKeyField(Product)
+    quantity = IntegerField()
 
 
 class Product_to_tag(BaseModel):

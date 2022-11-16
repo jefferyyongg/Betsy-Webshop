@@ -28,7 +28,7 @@ def list_products_per_tag(tag_id):
         print(q)
 
 
-def add_product_to_catalog(user_id, product):
+def add_product_to_catalog(user_id, product, quantity):
 
     Product.insert(product).execute()
 
@@ -36,35 +36,48 @@ def add_product_to_catalog(user_id, product):
     count = query.scalar()
 
     User_to_product.insert(
-        {User_to_product.user_id: user_id, User_to_product.product_id: count}).execute()
+        {User_to_product.user_id: user_id, User_to_product.product_id: count, User_to_product.quantity: quantity}).execute()
 
 
-# go back and add remove product when quantity == 0
-def update_stock(product_id, new_quantity):
-    if new_quantity == 0:
-        Product.delete().where(Product.id == product_id).execute()
+def update_stock(user_id, product_id, new_quantity):
+    if new_quantity <= 0:
         User_to_product.delete().where(User_to_product.product_id == product_id).execute()
     else:
-        Product.update(quantity=new_quantity).where(
-            Product.id == product_id).execute()
+        User_to_product.update(quantity=new_quantity).where(
+            User_to_product.user_id == user_id and User_to_product.product_id == product_id).execute()
 
 
-def purchase_product(product_id, buyer_id, quantity):
-
-    buyer = Product.select().where(Product.id == product_id).dicts()
-    for b in buyer:
-        b.pop("id")
-        add_product_to_catalog(buyer_id, b)
-    update_stock(len(Product), quantity)
-
-    seller = Product.select(Product.quantity).where(
-        Product.id == product_id).dicts()
+# had to add seller_id otherwise it will subract all sellers quantities with the same product
+# Changed the database structure so that multiple can have the same product with varying quantities
+def purchase_product(product_id, seller_id, buyer_id, quantity):
+    seller = User_to_product.select(User_to_product.quantity, User_to_product.user_id).where(
+        User_to_product.user_id == seller_id, User_to_product.product_id == product_id)
     for s in seller:
-        update_stock(product_id, list(s.values())[0] - quantity)
+        if s.quantity - quantity == 0:
+            update_stock(s.user_id, product_id, s.quantity - quantity)
+        elif s.quantity - quantity < 0:
+            print("SELLER DOES NOT HAVE ENOUGH STOCK")
+            return
+        else:
+            update_stock(s.user_id, product_id, s.quantity - quantity)
 
+    buyer = User_to_product.select(User_to_product.user_id, User_to_product.product_id, User_to_product.quantity).where(
+        User_to_product.user_id == buyer_id)
+    buyer_list = [int(str(b.product_id)) for b in buyer]
+
+    if product_id not in buyer_list:
+        User_to_product.insert(
+            {User_to_product.user_id: buyer_id, User_to_product.product_id: product_id, User_to_product.quantity: quantity}).execute()
+    else:
+        for b in User_to_product.select(User_to_product.quantity).where(User_to_product.user_id == buyer_id, User_to_product.product_id == product_id):
+            update_stock(buyer_id, product_id, b.quantity + quantity)
     report(product_id, buyer_id, quantity)
 
 
 def remove_product(product_id):
     Product.delete().where(Product.id == product_id).execute()
     User_to_product.delete().where(User_to_product.product_id == product_id).execute()
+
+
+if __name__ == "__main__":
+    ...

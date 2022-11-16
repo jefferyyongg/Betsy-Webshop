@@ -37,17 +37,17 @@ def insert_data():
 
     products = [
         {"name": "kitchen knife", "description": "Sharp kitchen knife",
-            "price_per_unit": 25.99, "quantity": 8},
+            "price_per_unit": 25.99},
         {"name": "dog toy", "description": "very squeaky and loud",
-            "price_per_unit": 14.99, "quantity": 14},
+            "price_per_unit": 14.99},
         {"name": "portable swimming pool", "description": "6x6x6 very durable",
-            "price_per_unit": 59.99, "quantity": 4},
+            "price_per_unit": 59.99},
         {"name": "football", "description": "Pro football",
-            "price_per_unit": 25.99, "quantity": 8},
+            "price_per_unit": 25.99},
         {"name": "dog food", "description": "delicious treat for pet",
-            "price_per_unit": 14.99, "quantity": 14},
+            "price_per_unit": 14.99},
         {"name": "outside pet house", "description": "very durable",
-            "price_per_unit": 59.99, "quantity": 4}
+            "price_per_unit": 59.99}
     ]
 
     Product.insert_many(products).execute()
@@ -62,12 +62,12 @@ def insert_data():
     Tag.insert_many(tags).execute()
 
     userproduct_data = [
-        {"user_id": 1,  "product_id": 2},
-        {"user_id": 1,  "product_id": 5},
-        {"user_id": 1,  "product_id": 6},
-        {"user_id": 2,  "product_id": 3},
-        {"user_id": 2,  "product_id": 4},
-        {"user_id": 3,  "product_id": 1},
+        {"user_id": 1,  "product_id": 2, "quantity": 8},
+        {"user_id": 1,  "product_id": 5, "quantity": 14},
+        {"user_id": 1,  "product_id": 6, "quantity": 4},
+        {"user_id": 2,  "product_id": 3, "quantity": 8},
+        {"user_id": 2,  "product_id": 4, "quantity": 14},
+        {"user_id": 3,  "product_id": 1, "quantity": 4},
     ]
 
     User_to_product.insert_many(userproduct_data).execute()
